@@ -1,0 +1,5 @@
+﻿<settings-container xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd">
+    <label text="Login at https://crowdcontrol.live/activate" />
+    <string-setting text="Key" value="login" hover-hint="The website activation key." />
+                                                        
+</settings-container>
