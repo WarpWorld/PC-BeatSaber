@@ -1,4 +1,9 @@
-﻿using IPA;
+﻿using System;
+using System.Reflection;
+using CrowdControl.BeatSaber.Effects;
+using IPA;
+using IPA.Config;
+using IPA.Config.Stores;
 using UnityEngine;
 using IPALogger = IPA.Logging.Logger;
 
@@ -9,8 +14,8 @@ namespace CrowdControl.BeatSaber
     {
         // TODO: If using Harmony, uncomment and change YourGitHub to the name of your GitHub account, or use the form "com.company.project.product"
         //       You must also add a reference to the Harmony assembly in the Libs folder.
-        // public const string HarmonyId = "com.github.YourGitHub.BeatSaberCC";
-        // internal static readonly HarmonyLib.Harmony harmony = new HarmonyLib.Harmony(HarmonyId);
+        public const string HarmonyId = "com.warpworld.beatsabercc";
+        internal static readonly HarmonyLib.Harmony harmony = new HarmonyLib.Harmony(HarmonyId);
 
         internal static Plugin Instance { get; private set; }
         internal static IPALogger Log { get; private set; }
@@ -30,15 +35,14 @@ namespace CrowdControl.BeatSaber
         }
 
         #region BSIPA Config
-        //Uncomment to use BSIPA's config
-        /*
+        
         [Init]
         public void InitWithConfig(Config conf)
         {
             Configuration.PluginConfig.Instance = conf.Generated<Configuration.PluginConfig>();
             Plugin.Log?.Debug("Config loaded");
         }
-        */
+        
         #endregion
 
 
@@ -51,7 +55,7 @@ namespace CrowdControl.BeatSaber
         public void OnEnable()
         {
             new GameObject("Crowd Control").AddComponent<CrowdControlBehavior>();
-            //ApplyHarmonyPatches();
+            ApplyHarmonyPatches();
         }
 
         /// <summary>
@@ -64,7 +68,7 @@ namespace CrowdControl.BeatSaber
         {
             if (PluginController != null)
                 GameObject.Destroy(PluginController);
-            //RemoveHarmonyPatches();
+            RemoveHarmonyPatches();
         }
 
         /*
@@ -83,7 +87,7 @@ namespace CrowdControl.BeatSaber
 
         // Uncomment the methods in this section if using Harmony
         #region Harmony
-        /*
+        
         /// <summary>
         /// Attempts to apply all the Harmony patches in this assembly.
         /// </summary>
@@ -109,7 +113,7 @@ namespace CrowdControl.BeatSaber
             try
             {
                 // Removes all patches with this HarmonyId
-                harmony.UnpatchAll(HarmonyId);
+                HarmonyLib.Harmony.UnpatchID(HarmonyId);
             }
             catch (Exception ex)
             {
@@ -117,7 +121,7 @@ namespace CrowdControl.BeatSaber
                 Plugin.Log?.Debug(ex);
             }
         }
-        */
+        
         #endregion
     }
 }
