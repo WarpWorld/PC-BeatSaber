@@ -1,5 +1,9 @@
-﻿<settings-container xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd">
+﻿<settings-container>
+  <vertical vertical-fit="PreferredSize" spacing="1.5" pad-top="2" horizontal-fit="PreferredSize">
     <label text="Login at https://crowdcontrol.live/activate" />
-    <string-setting text="Key" value="login" hover-hint="The website activation key." />
-                                                        
+    <string-setting apply-on-change="true" text="Key" value="Login" hover-hint="The website activation key." />
+    <horizontal pad="1">
+      <button id="connect-button" text="Connect to Crowd Control" on-click="ConnectClicked"/>
+    </horizontal>
+  </vertical>
 </settings-container>

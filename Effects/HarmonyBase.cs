@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Net.Sockets;
 using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace CrowdControl.BeatSaber.Effects
 {
@@ -187,7 +184,7 @@ class Patch7C
                 {
                     NoteCutDirection[] list = new NoteCutDirection[] { NoteCutDirection.Any, NoteCutDirection.Down, NoteCutDirection.DownLeft, NoteCutDirection.DownRight, NoteCutDirection.Left, NoteCutDirection.Right, NoteCutDirection.Up, NoteCutDirection.UpLeft, NoteCutDirection.UpRight };
 
-                    System.Random random = new System.Random();
+                    System.Random random = new();
                     int ind = random.Next(0, list.Length);
 
                     noteData.ChangeNoteCutDirection(list[ind]);
@@ -202,12 +199,12 @@ class Patch7C
                 {
                     if (noteData.colorType == ColorType.ColorA)
                     {
-                        var p = noteData.GetType().GetMethod("set_colorType", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                        var p = noteData.GetType().GetMethod("set_colorType", BindingFlags.Instance | BindingFlags.NonPublic);
                         p.Invoke(noteData, new object[] { ColorType.ColorB });
                     }
                     else if (noteData.colorType == ColorType.ColorB)
                     {
-                        var p = noteData.GetType().GetMethod("set_colorType", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+                        var p = noteData.GetType().GetMethod("set_colorType", BindingFlags.Instance | BindingFlags.NonPublic);
                         p.Invoke(noteData, new object[] { ColorType.ColorA });
                     }
                 }

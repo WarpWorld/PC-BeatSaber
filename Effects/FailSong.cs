@@ -12,7 +12,7 @@ namespace CrowdControl.BeatSaber.Effects
         {
             if (!HarmonyBase.isReady()) return EffectResult.Retry;
 
-            var p = HarmonyBase.mgr.GetType().GetField("_initData", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.FlattenHierarchy);
+            var p = HarmonyBase.mgr.GetType().GetField("_initData", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
 
             if (p != null)
             {
@@ -21,28 +21,28 @@ namespace CrowdControl.BeatSaber.Effects
                 p.SetValue(id, true);
             }
 
-            p = HarmonyBase.mgr.GetType().GetField("_gameEnergyCounter", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.FlattenHierarchy);
+            p = HarmonyBase.mgr.GetType().GetField("_gameEnergyCounter", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
 
             if (p != null)
             {
                 GameEnergyCounter gec = (GameEnergyCounter)p.GetValue(HarmonyBase.mgr);
 
-                p = gec.GetType().GetField("_didReach0Energy", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.FlattenHierarchy);
+                p = gec.GetType().GetField("_didReach0Energy", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
                 p.SetValue(gec, false);
 
                 
-                var m2 = gec.GetType().GetMethod("set_noFail", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.FlattenHierarchy);
+                var m2 = gec.GetType().GetMethod("set_noFail", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
 
                 if (m2 != null) m2.Invoke(gec, new object[] { false });
 
-                m2 = gec.GetType().GetMethod("set_instaFail", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.FlattenHierarchy);
+                m2 = gec.GetType().GetMethod("set_instaFail", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
 
                 if (m2 != null) m2.Invoke(gec, new object[] { true });
                 
                 //m2 = typeof(GameEnergyCounter).GetRuntimeMethod("ProcessEnergyChange", new[] { typeof(float) });
-                m2 = gec.GetType().GetMethod("ProcessEnergyChange", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.FlattenHierarchy);
+                m2 = gec.GetType().GetMethod("ProcessEnergyChange", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
                 
-                var m3 = gec.GetType().GetMethod("set_energy", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.FlattenHierarchy);
+                var m3 = gec.GetType().GetMethod("set_energy", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
                 m3.Invoke(gec, new object[] { 1.0f });
                 
 

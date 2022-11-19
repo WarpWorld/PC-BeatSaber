@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CrowdControl.BeatSaber</RootNamespace>
-    <AssemblyName>BeatSaberCC</AssemblyName>
+    <AssemblyName>CrowdControl</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <DebugSymbols>true</DebugSymbols>
@@ -26,12 +26,14 @@
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="$(DefineConstants.Contains('CIBuild')) OR '$(NCrunch)' == '1'">
     <DisableCopyToPlugins>True</DisableCopyToPlugins>
@@ -117,9 +119,13 @@
       <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.VRModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="BS_Utils">
+      <HintPath>$(BeatSaberDir)\..\Plugins\BS_Utils.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Configuration\settings.bsml" />
+    <EmbeddedResource Include="Configuration\settings.bsml" />
     <Compile Include="Configuration\SettingsChanged.cs" />
     <Compile Include="Effects\AllNotesAny.cs" />
     <Compile Include="Effects\AllNotesDown.cs" />
@@ -138,6 +144,7 @@
     <Compile Include="Effects\NoteWaveY.cs" />
     <Compile Include="Effects\Rewind.cs" />
     <Compile Include="Effects\TinyNotes.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\PluginConfig.cs" />
     <Compile Include="CrowdControlBehavior.cs" />

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Reflection;
-using CrowdControl.BeatSaber.Effects;
+using BeatSaberMarkupLanguage.Settings;
+using CrowdControl.BeatSaber.Configuration;
 using IPA;
 using IPA.Config;
 using IPA.Config.Stores;
 using UnityEngine;
 using IPALogger = IPA.Logging.Logger;
+using Object = UnityEngine.Object;
 
 namespace CrowdControl.BeatSaber
 {
@@ -15,11 +17,14 @@ namespace CrowdControl.BeatSaber
         // TODO: If using Harmony, uncomment and change YourGitHub to the name of your GitHub account, or use the form "com.company.project.product"
         //       You must also add a reference to the Harmony assembly in the Libs folder.
         public const string HarmonyId = "com.warpworld.beatsabercc";
-        internal static readonly HarmonyLib.Harmony harmony = new HarmonyLib.Harmony(HarmonyId);
+
+        public const string CROWD_CONTROL = "Crowd Control";
+
+        internal static readonly HarmonyLib.Harmony harmony = new(HarmonyId);
 
         internal static Plugin Instance { get; private set; }
         internal static IPALogger Log { get; private set; }
-        internal static CrowdControlBehavior PluginController => CrowdControlBehavior.Instance;
+        internal static CrowdControlBehavior Behavior => CrowdControlBehavior.Instance;
 
         /// <summary>
         /// Called when the plugin is first loaded by IPA (either when the game starts or when the plugin is enabled if it starts disabled).
@@ -30,8 +35,11 @@ namespace CrowdControl.BeatSaber
         public Plugin(IPALogger logger)
         {
             Instance = this;
-            Plugin.Log = logger;
-            Plugin.Log?.Debug("Logger initialized.");
+            Log = logger;
+            Log?.Debug("Logger initialized.");
+            Client.Binary.Log.OnMessage += (s, _) => Log?.Debug(s);
+
+            BSMLSettings.instance.AddSettingsMenu("Crowd Control", "CrowdControl.BeatSaber.Configuration.settings.bsml", new SettingsChanged());
         }
 
         #region BSIPA Config
@@ -39,8 +47,8 @@ namespace CrowdControl.BeatSaber
         [Init]
         public void InitWithConfig(Config conf)
         {
-            Configuration.PluginConfig.Instance = conf.Generated<Configuration.PluginConfig>();
-            Plugin.Log?.Debug("Config loaded");
+            PluginConfig.Instance = conf.Generated<PluginConfig>();
+            Log?.Debug("Config loaded");
         }
         
         #endregion
@@ -54,7 +62,8 @@ namespace CrowdControl.BeatSaber
         [OnEnable]
         public void OnEnable()
         {
-            new GameObject("Crowd Control").AddComponent<CrowdControlBehavior>();
+            BS_Utils.Gameplay.ScoreSubmission.ProlongedDisableSubmission(CROWD_CONTROL);
+            new GameObject(CROWD_CONTROL).AddComponent<CrowdControlBehavior>();
             ApplyHarmonyPatches();
         }
 
@@ -66,9 +75,10 @@ namespace CrowdControl.BeatSaber
         [OnDisable]
         public void OnDisable()
         {
-            if (PluginController != null)
-                GameObject.Destroy(PluginController);
+            if (Behavior != null)
+                Object.Destroy(Behavior);
             RemoveHarmonyPatches();
+            BS_Utils.Gameplay.ScoreSubmission.RemoveProlongedDisable(CROWD_CONTROL);
         }
 
         /*
@@ -95,13 +105,13 @@ namespace CrowdControl.BeatSaber
         {
             try
             {
-                Plugin.Log?.Debug("Applying Harmony patches.");
+                Log?.Debug("Applying Harmony patches.");
                 harmony.PatchAll(Assembly.GetExecutingAssembly());
             }
             catch (Exception ex)
             {
-                Plugin.Log?.Error("Error applying Harmony patches: " + ex.Message);
-                Plugin.Log?.Debug(ex);
+                Log?.Error("Error applying Harmony patches: " + ex.Message);
+                Log?.Debug(ex);
             }
         }
 
@@ -117,8 +127,8 @@ namespace CrowdControl.BeatSaber
             }
             catch (Exception ex)
             {
-                Plugin.Log?.Error("Error removing Harmony patches: " + ex.Message);
-                Plugin.Log?.Debug(ex);
+                Log?.Error("Error removing Harmony patches: " + ex.Message);
+                Log?.Debug(ex);
             }
         }
         
