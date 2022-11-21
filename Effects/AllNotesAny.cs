@@ -1,4 +1,6 @@
-﻿namespace CrowdControl.BeatSaber.Effects
+﻿using CrowdControl.Client.Binary;
+
+namespace CrowdControl.BeatSaber.Effects
 {
     [TimedEffectData(
       ID = 6,
@@ -7,27 +9,41 @@
     )]
     class AllNotesAny : TimedEffect
     {
-        public override EffectResult OnStart(CCEffectInstance effectInstance)
+        public override bool Start()
         {
-            if (!HarmonyBase.isReady()) return EffectResult.Retry;
+            Log.Debug("Starting effect AllNotesAny");
+            if (!HarmonyBase.isReady())
+            {
+                Log.Debug("HarmonyBase is not ready. Aborting...");
+                return false;
+            }
 
-            if (HarmonyBase.allany || HarmonyBase.alldown || HarmonyBase.allrandom) return EffectResult.Retry;
+            if (HarmonyBase.allany || HarmonyBase.alldown || HarmonyBase.allrandom)
+            {
+                Log.Debug("Conflict detected. Aborting...");
+                return false;
+            }
 
             HarmonyBase.allany = true;
-
-            return EffectResult.Success;
-        }
-
-        public override bool OnStop(CCEffectInstance effectInstance, bool force)
-        {
-            HarmonyBase.allany = false;
-
+            Log.Debug("Started effect AllNotesAny");
             return true;
         }
 
-        public override bool ShouldRun()
+        public override bool Stop(bool force)
         {
-            if (!HarmonyBase.isReady()) return false;
+            HarmonyBase.allany = false;
+            Log.Debug("Stopped effect AllNotesAny");
+            return true;
+        }
+
+        public override bool IsReady()
+        {
+            Log.Debug("Checking effect AllNotesAny");
+            if (!HarmonyBase.isReady())
+            {
+                Log.Debug("HarmonyBase is not ready. Aborting...");
+                return false;
+            }
             return true;
         }
     }

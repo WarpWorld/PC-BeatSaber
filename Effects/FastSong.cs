@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace CrowdControl.BeatSaber.Effects
 {
@@ -9,15 +10,15 @@ namespace CrowdControl.BeatSaber.Effects
     )]
     class FastSong : TimedEffect
     {
-        public override EffectResult OnStart(CCEffectInstance effectInstance)
+        public override bool Start()
         {
-            if (!HarmonyBase.isReady()) return EffectResult.Retry;
+            if (!HarmonyBase.isReady()) return false;
 
             
             
-            if (HarmonyBase.speed != 0) return EffectResult.Retry;
+            if (HarmonyBase.speed != 0) return false;
 
-            var p = HarmonyBase.gci.GetType().GetField("_sceneSetupData", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            var p = HarmonyBase.gci.GetType().GetField("_sceneSetupData", BindingFlags.Instance | BindingFlags.NonPublic);
 
             Plugin.Log?.Debug($"p: {p}");
 
@@ -48,7 +49,7 @@ namespace CrowdControl.BeatSaber.Effects
 
             Plugin.Log?.Debug($"speed: {HarmonyBase.speed}");
 
-            p = HarmonyBase.gci.GetType().GetField("_audioManager", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            p = HarmonyBase.gci.GetType().GetField("_audioManager", BindingFlags.Instance | BindingFlags.NonPublic);
 
             Plugin.Log?.Debug($"p: {p}");
 
@@ -56,17 +57,17 @@ namespace CrowdControl.BeatSaber.Effects
 
             //am.musicPitch = 1.0f / Base.speed;
 
-            return EffectResult.Success;
+            return true;
         }
 
-        public override bool OnStop(CCEffectInstance effectInstance, bool force)
+        public override bool Stop(bool force)
         {
             HarmonyBase.scale = 0;
 
             return true;
         }
 
-        public override bool ShouldRun()
+        public override bool IsReady()
         {
             if (!HarmonyBase.isReady()) return false;
             return true;

@@ -58,7 +58,7 @@ namespace CrowdControl.BeatSaber
             //BS_Utils.Utilities.BSEvents.gameSceneLoaded += BSEvents_gameSceneLoaded;
 
             Plugin.Log?.Debug("Creating binary client.");
-            m_client = new BinaryClient();
+            m_client = new();
             m_client.ConnectionStateChanged += state =>
             {
                 Plugin.Log?.Debug("Connection state changed to " + Enum.GetName(typeof(ConnectionStateValue), state));
@@ -71,7 +71,12 @@ namespace CrowdControl.BeatSaber
 
                     var effects = Assembly.GetExecutingAssembly().
                         GetTypesWithAttribute<EffectData>().
-                        Select(d => new EffectDescription(d.Item2.Name, d.Item2.ID.ToString("D")));
+                        Select(d =>
+                        {
+                            EffectDescription result = new(d.Item2.Name, d.Item2.ID.ToString("D"));
+                            if (d.Item2 is TimedEffectData td) result.Duration = result.DefaultDuration = td.Duration;
+                            return result;
+                        });
                     m_client.LoadMenu(new(effects));
                 }
             };

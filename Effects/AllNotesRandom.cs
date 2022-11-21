@@ -2,30 +2,30 @@
 {
     [TimedEffectData(
       ID = 8,
-      Name = "All Notes Any Direction (10 Seconds)",
+      Name = "All Notes Random Direction (10 Seconds)",
       Duration = 10
     )]
     class AllNotesRandom : TimedEffect
     {
-        public override EffectResult OnStart(CCEffectInstance effectInstance)
+        public override bool Start()
         {
-            if (!HarmonyBase.isReady()) return EffectResult.Retry;
+            if (!HarmonyBase.isReady()) return false;
 
-            if (HarmonyBase.allany || HarmonyBase.alldown || HarmonyBase.allrandom) return EffectResult.Retry;
+            if (HarmonyBase.allany || HarmonyBase.alldown || HarmonyBase.allrandom) return false;
 
             HarmonyBase.allrandom = true;
 
-            return EffectResult.Success;
+            return true;
         }
 
-        public override bool OnStop(CCEffectInstance effectInstance, bool force)
+        public override bool Stop(bool force)
         {
             HarmonyBase.allrandom = false;
 
             return true;
         }
 
-        public override bool ShouldRun()
+        public override bool IsReady()
         {
             if (!HarmonyBase.isReady()) return false;
             return true;

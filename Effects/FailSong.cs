@@ -8,9 +8,9 @@ namespace CrowdControl.BeatSaber.Effects
     )]
     class BlackWhite : Effect
     {
-        public override EffectResult OnStart(CCEffectInstance effectInstance)
+        public override bool Start()
         {
-            if (!HarmonyBase.isReady()) return EffectResult.Retry;
+            if (!HarmonyBase.isReady()) return false;
 
             var p = HarmonyBase.mgr.GetType().GetField("_initData", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
 
@@ -50,7 +50,7 @@ namespace CrowdControl.BeatSaber.Effects
             }
 
 
-            return EffectResult.Success;
+            return true;
         }
     }
 }

@@ -7,25 +7,25 @@
     )]
     class NoteWaveY : TimedEffect
     {
-        public override EffectResult OnStart(CCEffectInstance effectInstance)
+        public override bool Start()
         {
-            if (!HarmonyBase.isReady()) return EffectResult.Retry;
+            if (!HarmonyBase.isReady()) return false;
 
-            if (HarmonyBase.wavey) return EffectResult.Retry;
+            if (HarmonyBase.wavey) return false;
 
             HarmonyBase.wavey = true;
 
-            return EffectResult.Success;
+            return true;
         }
 
-        public override bool OnStop(CCEffectInstance effectInstance, bool force)
+        public override bool Stop(bool force)
         {
             HarmonyBase.wavey = false;
 
             return true;
         }
 
-        public override bool ShouldRun()
+        public override bool IsReady()
         {
             if (!HarmonyBase.isReady()) return false;
             return true;

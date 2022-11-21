@@ -18,5 +18,13 @@ namespace CrowdControl.BeatSaber
                 }
             }
         }
+
+        public static bool TryGetAttribute<T>(this Type type, out T value) where T : Attribute
+        {
+            value = type.GetCustomAttributes(typeof(T), true).OfType<T>().FirstOrDefault();
+            return (value != null);
+        }
+
+        public static bool IsAssignableTo(this Type type, Type otherType) => otherType.IsAssignableFrom(type);
     }
 }

@@ -7,24 +7,24 @@
     )]
     class TinyNotes : TimedEffect
     {
-        public override EffectResult OnStart(CCEffectInstance effectInstance)
+        public override bool Start()
         {
-            if (!HarmonyBase.isReady()) return EffectResult.Retry;
+            if (!HarmonyBase.isReady()) return false;
 
-            if (HarmonyBase.scale != 0) return EffectResult.Retry;
+            if (HarmonyBase.scale != 0) return false;
             HarmonyBase.scale = 0.25f;
 
-            return EffectResult.Success;
+            return true;
         }
 
-        public override bool OnStop(CCEffectInstance effectInstance, bool force)
+        public override bool Stop(bool force)
         {
             HarmonyBase.scale = 0;
 
             return true;
         }
 
-        public override bool ShouldRun()
+        public override bool IsReady()
         {
             if (!HarmonyBase.isReady()) return false;
             return true;

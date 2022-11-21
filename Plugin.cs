@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Reflection;
 using BeatSaberMarkupLanguage.Settings;
+using BS_Utils.Gameplay;
 using CrowdControl.BeatSaber.Configuration;
+using HarmonyLib;
 using IPA;
 using IPA.Config;
 using IPA.Config.Stores;
@@ -20,7 +22,7 @@ namespace CrowdControl.BeatSaber
 
         public const string CROWD_CONTROL = "Crowd Control";
 
-        internal static readonly HarmonyLib.Harmony harmony = new(HarmonyId);
+        internal static readonly Harmony harmony = new(HarmonyId);
 
         internal static Plugin Instance { get; private set; }
         internal static IPALogger Log { get; private set; }
@@ -62,7 +64,7 @@ namespace CrowdControl.BeatSaber
         [OnEnable]
         public void OnEnable()
         {
-            BS_Utils.Gameplay.ScoreSubmission.ProlongedDisableSubmission(CROWD_CONTROL);
+            ScoreSubmission.ProlongedDisableSubmission(CROWD_CONTROL);
             new GameObject(CROWD_CONTROL).AddComponent<CrowdControlBehavior>();
             ApplyHarmonyPatches();
         }
@@ -78,7 +80,7 @@ namespace CrowdControl.BeatSaber
             if (Behavior != null)
                 Object.Destroy(Behavior);
             RemoveHarmonyPatches();
-            BS_Utils.Gameplay.ScoreSubmission.RemoveProlongedDisable(CROWD_CONTROL);
+            ScoreSubmission.RemoveProlongedDisable(CROWD_CONTROL);
         }
 
         /*
@@ -123,7 +125,7 @@ namespace CrowdControl.BeatSaber
             try
             {
                 // Removes all patches with this HarmonyId
-                HarmonyLib.Harmony.UnpatchID(HarmonyId);
+                Harmony.UnpatchID(HarmonyId);
             }
             catch (Exception ex)
             {

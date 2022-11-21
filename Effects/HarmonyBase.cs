@@ -2,6 +2,7 @@
 using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
+using Random = System.Random;
 
 namespace CrowdControl.BeatSaber.Effects
 {
@@ -38,7 +39,7 @@ class Patch2
     {
         public static void Postfix(StandardLevelScenesTransitionSetupDataSO __instance)
         {
-            Plugin.Log?.Debug($"Init");
+            Plugin.Log?.Debug("Init");
             Plugin.Log?.Debug($"{__instance}");
 
             var p = __instance.GetType().GetProperty("gameplayCoreSceneSetupData", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
@@ -56,7 +57,7 @@ class Patch2
     {
         public static void Postfix(AudioTimeSyncController __instance)
         {
-            Plugin.Log?.Debug($"StartSong2");
+            Plugin.Log?.Debug("StartSong2");
             HarmonyBase.atc = __instance;
         }
     }
@@ -162,13 +163,13 @@ class Patch7C
     {
         public static bool Prefix(BeatmapObjectManager __instance, NoteData noteData)
         {
-            Plugin.Log?.Debug($"SpawnBasicNote");
+            Plugin.Log?.Debug("SpawnBasicNote");
 
             if (noteData.gameplayType == NoteData.GameplayType.Normal)
             {
                 if(noteData.time < HarmonyBase.atc.songTime)
                 {
-                    Plugin.Log?.Debug($"Skipped Note");
+                    Plugin.Log?.Debug("Skipped Note");
                     return false;
                 }
 
@@ -182,9 +183,9 @@ class Patch7C
                 }
                 if (HarmonyBase.allrandom)
                 {
-                    NoteCutDirection[] list = new NoteCutDirection[] { NoteCutDirection.Any, NoteCutDirection.Down, NoteCutDirection.DownLeft, NoteCutDirection.DownRight, NoteCutDirection.Left, NoteCutDirection.Right, NoteCutDirection.Up, NoteCutDirection.UpLeft, NoteCutDirection.UpRight };
+                    NoteCutDirection[] list = { NoteCutDirection.Any, NoteCutDirection.Down, NoteCutDirection.DownLeft, NoteCutDirection.DownRight, NoteCutDirection.Left, NoteCutDirection.Right, NoteCutDirection.Up, NoteCutDirection.UpLeft, NoteCutDirection.UpRight };
 
-                    System.Random random = new();
+                    Random random = new();
                     int ind = random.Next(0, list.Length);
 
                     noteData.ChangeNoteCutDirection(list[ind]);
@@ -230,7 +231,7 @@ class Patch7C
     {
         public static void Prefix()
         {
-            Plugin.Log?.Debug($"CreateTransformedBeatmapData");
+            Plugin.Log?.Debug("CreateTransformedBeatmapData");
         }
     }
 
@@ -308,14 +309,14 @@ class Patch7C
         public static float oldspeed = 0;
         public static float oldvolume = 0;
 
-        public static int frame = 0;
-        public static float time = 0;
+        public static int frame;
+        public static float time;
 
-        public static StandardLevelGameplayManager mgr = null;
-        public static GameplayCoreInstaller gci = null;
-        public static BeatmapCallbacksController boc = null;
-        public static AudioTimeSyncController atc = null;
-        public static BasicBeatmapObjectManager bom = null;
+        public static StandardLevelGameplayManager mgr;
+        public static GameplayCoreInstaller gci;
+        public static BeatmapCallbacksController boc;
+        public static AudioTimeSyncController atc;
+        public static BasicBeatmapObjectManager bom;
 
         public static bool check = false;
 

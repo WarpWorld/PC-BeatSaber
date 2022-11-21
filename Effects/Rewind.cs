@@ -11,9 +11,9 @@ namespace CrowdControl.BeatSaber.Effects
     )]
     class Rewind : Effect
     {
-        public override EffectResult OnStart(CCEffectInstance effectInstance)
+        public override bool Start()
         {
-            if (!HarmonyBase.isReady()) return EffectResult.Retry;
+            if (!HarmonyBase.isReady()) return false;
 
             try
             {
@@ -25,7 +25,7 @@ namespace CrowdControl.BeatSaber.Effects
 
                 float time = HarmonyBase.atc.songTime / HarmonyBase.atc.timeScale - start - 10.0f;
 
-                if (time < 0) return EffectResult.Retry;
+                if (time < 0) return false;
 
                 Plugin.Log?.Debug($"New Time: {time}");
 
@@ -35,9 +35,9 @@ namespace CrowdControl.BeatSaber.Effects
 
                 List<IBeatmapObjectController> objs = (List<IBeatmapObjectController>)p.GetValue(HarmonyBase.bom);
 
-                var m = typeof(BeatmapObjectManager).GetMethod("Despawn", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy, Type.DefaultBinder, new[] { typeof(NoteController) }, null);
-                var m2 = typeof(BeatmapObjectManager).GetMethod("Despawn", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy, Type.DefaultBinder, new[] { typeof(ObstacleController) }, null);
-                var m3 = typeof(BeatmapObjectManager).GetMethod("Despawn", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy, Type.DefaultBinder, new[] { typeof(SliderController) }, null);
+                var m = typeof(BeatmapObjectManager).GetMethod("Despawn", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy, null, new[] { typeof(NoteController) }, null);
+                var m2 = typeof(BeatmapObjectManager).GetMethod("Despawn", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy, null, new[] { typeof(ObstacleController) }, null);
+                var m3 = typeof(BeatmapObjectManager).GetMethod("Despawn", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy, null, new[] { typeof(SliderController) }, null);
 
 
                 foreach (IBeatmapObjectController obj in objs.ToList())
@@ -75,7 +75,7 @@ namespace CrowdControl.BeatSaber.Effects
                 Plugin.Log?.Debug($"e: {e}");
 
             }
-            return EffectResult.Success;
+            return true;
             
         }
     }

@@ -7,25 +7,25 @@
     )]
     class NoteColorRandom : TimedEffect
     {
-        public override EffectResult OnStart(CCEffectInstance effectInstance)
+        public override bool Start()
         {
-            if (!HarmonyBase.isReady()) return EffectResult.Retry;
+            if (!HarmonyBase.isReady()) return false;
 
-            if (HarmonyBase.colorrandom || HarmonyBase.colorswap) return EffectResult.Retry;
+            if (HarmonyBase.colorrandom || HarmonyBase.colorswap) return false;
 
             HarmonyBase.colorrandom = true;
 
-            return EffectResult.Success;
+            return true;
         }
 
-        public override bool OnStop(CCEffectInstance effectInstance, bool force)
+        public override bool Stop(bool force)
         {
             HarmonyBase.colorrandom = false;
 
             return true;
         }
 
-        public override bool ShouldRun()
+        public override bool IsReady()
         {
             if (!HarmonyBase.isReady()) return false;
             return true;
