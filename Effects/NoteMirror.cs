@@ -1,15 +1,17 @@
-﻿namespace CrowdControl.BeatSaber.Effects
+﻿using CrowdControl.Client.Binary;
+
+namespace CrowdControl.BeatSaber.Effects
 {
     [TimedEffectData(
-      ID = 667,
-      Name = "Mirror Notes (20 Seconds)",
-      Duration = 20
+      ID = 14,
+      Name = "Mirror Notes",
+      Duration = 10
     )]
-    class NoteMirror : TimedEffect
+    class NoteMirror : TimedEffect//bug not working
     {
-        public override bool Start()
+        public override bool StartActions(SchedulerContext context)
         {
-            if (!HarmonyBase.isReady()) return false;
+            if (!HarmonyBase.IsReady()) return false;
 
             if (HarmonyBase.mirror) return false;
 
@@ -18,7 +20,7 @@
             return true;
         }
 
-        public override bool Stop(bool force)
+        public override bool StopActions(bool force)
         {
             HarmonyBase.mirror = false;
 
@@ -27,7 +29,7 @@
 
         public override bool IsReady()
         {
-            if (!HarmonyBase.isReady()) return false;
+            if (!HarmonyBase.IsReady()) return false;
             return true;
         }
     }

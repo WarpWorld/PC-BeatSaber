@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Reflection;
+using System.Threading.Tasks;
 using HarmonyLib;
 using UnityEngine;
 using Random = System.Random;
@@ -13,7 +15,7 @@ class Patch
     public static void Postfix(SimpleLevelStarter __instance)
     {
         Plugin.Log?.Debug($"StartLevel A");
-        var p = __instance.GetType().GetField("_level", BindingFlags.Instance | BindingFlags.NonPublic);
+        var p = __instance.GetType().GetField("_level", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         BeatmapLevelSO cw = (BeatmapLevelSO)p.GetValue(__instance);
 
         Plugin.Log?.Debug($"Song Start - {cw.songName} by {cw.songAuthorName} Length: {cw.songDuration}");
@@ -42,7 +44,7 @@ class Patch2
             Plugin.Log?.Debug("Init");
             Plugin.Log?.Debug($"{__instance}");
 
-            var p = __instance.GetType().GetProperty("gameplayCoreSceneSetupData", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
+            var p = __instance.GetType().GetProperty("gameplayCoreSceneSetupData", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy);
             GameplayCoreSceneSetupData gsd = (GameplayCoreSceneSetupData)p.GetValue(__instance);
 
 
@@ -134,7 +136,7 @@ class Patch7C
             HarmonyBase.frame++;
             HarmonyBase.time += Time.deltaTime;
 
-            /*var p = __instance.GetType().GetField("_timeScale", BindingFlags.Instance | BindingFlags.NonPublic);
+            /*var p = __instance.GetType().GetField("_timeScale", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         Plugin.Log?.Debug($"p: {p}");
         p.SetValue(__instance, 2.0f);
         Plugin.Log?.Debug($"scale: {__instance.timeScale}");
@@ -144,12 +146,12 @@ class Patch7C
         if (TestEffectPack.Base.speed != 0)
         {
 
-            var p = __instance.GetType().GetField("_timeScale", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            var p = __instance.GetType().GetField("_timeScale", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | BindingFlags.NonPublic);
             p.SetValue(__instance, TestEffectPack.Base.speed);
 
         } else if (TestEffectPack.Base.oldspeed != 0)
         {
-            var p = __instance.GetType().GetField("_timeScale", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            var p = __instance.GetType().GetField("_timeScale", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | BindingFlags.NonPublic);
             p.SetValue(__instance, TestEffectPack.Base.oldspeed);
             TestEffectPack.Base.oldspeed = 0;
         }
@@ -161,10 +163,21 @@ class Patch7C
     [HarmonyPatch(typeof(BasicBeatmapObjectManager), "ProcessNoteData")]
     class Patch15B
     {
+        private static readonly Random RNG = new();
+        private static readonly NoteCutDirection[] CUT_TYPES = {
+            NoteCutDirection.Any,
+            NoteCutDirection.UpLeft,
+            NoteCutDirection.Up,
+            NoteCutDirection.UpRight,
+            NoteCutDirection.Left,
+            NoteCutDirection.Right,
+            NoteCutDirection.DownLeft,
+            NoteCutDirection.Down,
+            NoteCutDirection.DownRight
+        };
+
         public static bool Prefix(BeatmapObjectManager __instance, NoteData noteData)
         {
-            Plugin.Log?.Debug("SpawnBasicNote");
-
             if (noteData.gameplayType == NoteData.GameplayType.Normal)
             {
                 if(noteData.time < HarmonyBase.atc.songTime)
@@ -173,22 +186,42 @@ class Patch7C
                     return false;
                 }
 
-                if (HarmonyBase.alldown)
-                {
-                    noteData.ChangeNoteCutDirection(NoteCutDirection.Down);
-                }
-                if (HarmonyBase.allany)
-                {
-                    noteData.SetNoteToAnyCutDirection();
-                }
-                if (HarmonyBase.allrandom)
-                {
-                    NoteCutDirection[] list = { NoteCutDirection.Any, NoteCutDirection.Down, NoteCutDirection.DownLeft, NoteCutDirection.DownRight, NoteCutDirection.Left, NoteCutDirection.Right, NoteCutDirection.Up, NoteCutDirection.UpLeft, NoteCutDirection.UpRight };
+                HarmonyBase.FireNextNoteActions();
 
-                    Random random = new();
-                    int ind = random.Next(0, list.Length);
-
-                    noteData.ChangeNoteCutDirection(list[ind]);
+                switch (HarmonyBase.arrowModifier)
+                {
+                    case HarmonyBase.ArrowDirection.Dot:
+                        noteData.SetNoteToAnyCutDirection();
+                        break;
+                    case HarmonyBase.ArrowDirection.UpLeft:
+                        noteData.ChangeNoteCutDirection(NoteCutDirection.UpLeft);
+                        break;
+                    case HarmonyBase.ArrowDirection.Up:
+                        noteData.ChangeNoteCutDirection(NoteCutDirection.Up);
+                        break;
+                    case HarmonyBase.ArrowDirection.UpRight:
+                        noteData.ChangeNoteCutDirection(NoteCutDirection.UpRight);
+                        break;
+                    case HarmonyBase.ArrowDirection.Left:
+                        noteData.ChangeNoteCutDirection(NoteCutDirection.Left);
+                        break;
+                    case HarmonyBase.ArrowDirection.Right:
+                        noteData.ChangeNoteCutDirection(NoteCutDirection.Right);
+                        break;
+                    case HarmonyBase.ArrowDirection.DownLeft:
+                        noteData.ChangeNoteCutDirection(NoteCutDirection.DownLeft);
+                        break;
+                    case HarmonyBase.ArrowDirection.Down:
+                        noteData.ChangeNoteCutDirection(NoteCutDirection.Down);
+                        break;
+                    case HarmonyBase.ArrowDirection.DownRight:
+                        noteData.ChangeNoteCutDirection(NoteCutDirection.DownRight);
+                        break;
+                    case HarmonyBase.ArrowDirection.Random:
+                        noteData.ChangeNoteCutDirection(CUT_TYPES[RNG.Next(0, CUT_TYPES.Length)]);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
 
                 if (HarmonyBase.colorrandom)
@@ -198,15 +231,16 @@ class Patch7C
 
                 if (HarmonyBase.colorswap)
                 {
-                    if (noteData.colorType == ColorType.ColorA)
+                    var p = typeof(NoteData).GetProperty("colorType", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+                    switch (noteData.colorType)
                     {
-                        var p = noteData.GetType().GetMethod("set_colorType", BindingFlags.Instance | BindingFlags.NonPublic);
-                        p.Invoke(noteData, new object[] { ColorType.ColorB });
-                    }
-                    else if (noteData.colorType == ColorType.ColorB)
-                    {
-                        var p = noteData.GetType().GetMethod("set_colorType", BindingFlags.Instance | BindingFlags.NonPublic);
-                        p.Invoke(noteData, new object[] { ColorType.ColorA });
+                        case ColorType.ColorA:
+                            p.SetValue(noteData, ColorType.ColorB);
+                            break;
+                        case ColorType.ColorB:
+                            p.SetValue(noteData, ColorType.ColorA);
+                            break;
                     }
                 }
             }
@@ -215,7 +249,7 @@ class Patch7C
             {
                 /*if (TestEffectPack.Base.mirror)
             {
-                var p = TestEffectPack.Base.boc.GetType().GetField("_beatmapData", BindingFlags.Instance | BindingFlags.NonPublic);
+                var p = TestEffectPack.Base.boc.GetType().GetField("_beatmapData", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 Plugin.Log?.Debug($"p: {p}");
                 IReadonlyBeatmapData mapdat = (IReadonlyBeatmapData)p.GetValue(TestEffectPack.Base.boc);
                 Plugin.Log?.Debug($"lines: {mapdat.numberOfLines}");
@@ -261,7 +295,6 @@ class Patch7C
     {
         public static void Postfix(NoteController __instance)
         {
-
             Vector3 pos = __instance.transform.localPosition;
 
             if (HarmonyBase.wavey)
@@ -289,25 +322,42 @@ class Patch7C
     }
 
 
-    public class HarmonyBase
+    public static class HarmonyBase
     {
-        public static bool patched = false;
+        public enum ArrowDirection
+        {
+            Dot,
 
-        public static bool alldown = false;
-        public static bool allany = false;
-        public static bool allrandom = false;
+            UpLeft,
+            Up,
+            UpRight,
+            Left,
+            Right,
+            DownLeft,
+            Down,
+            DownRight,
+
+            Random
+        }
+
+        public static ArrowDirection? arrowModifier;
 
         public static bool colorswap = false;
         public static bool colorrandom = false;
+
         public static bool mirror = false;
 
         public static bool wavex = false;
         public static bool wavey = false;
 
-        public static float scale = 0;
-        public static float speed = 2.0f;
-        public static float oldspeed = 0;
-        public static float oldvolume = 0;
+
+        public static float njs;
+        public static float jd;
+        public static float scale;
+        public static float speed = 2f;
+
+        public static float oldspeed;
+        public static float oldvolume;
 
         public static int frame;
         public static float time;
@@ -320,37 +370,42 @@ class Patch7C
 
         public static bool check = false;
 
-        public static FieldInfo GetBackingField(Type type, string propertyName)
-        {
-            return type.GetField($"<{propertyName}>k__BackingField", BindingFlags.Static | BindingFlags.NonPublic);
-        }
-
-        public void start()
-        {
-
-        }
-        
-
-
-        public static bool isReady()
+        public static bool IsReady()
         {
             return true;
         }
 
-
-
-        public static bool inLevel()
+        public static bool InLevel()
         {
             try
             {
-
+                return true;
             }
             catch (Exception e)
             {
+                Plugin.Log?.Error(e);
                 return false;
             }
-            return false;
         }
 
+        private static readonly ConcurrentQueue<Action> m_nextNoteActions = new();
+        public static void NextNoteOnce(Action action) => m_nextNoteActions.Enqueue(action);
+        public static event Action NextNote;
+        internal static void FireNextNoteActions()
+        {
+            try { NextNote?.Invoke(); }
+            catch (Exception e) { Plugin.Log?.Error(e); }
+            while (m_nextNoteActions.TryDequeue(out Action a))
+            {
+                try { a(); }
+                catch (Exception e) { Plugin.Log?.Error(e); }
+            }
+        }
+        public static Task NextNoteAsync()
+        {
+            TaskCompletionSource<object> tcs = new();
+            m_nextNoteActions.Enqueue(() => tcs.SetResult(null));
+            return tcs.Task;
+        }
     }
 }

@@ -1,22 +1,23 @@
 ﻿using System;
 using System.Reflection;
+using CrowdControl.Client.Binary;
 using UnityEngine;
 
 namespace CrowdControl.BeatSaber.Effects
 {
     [TimedEffectData(
       ID = 9,
-      Name = "Mute Song (10 Seconds)",
+      Name = "Mute Song",
       Duration = 10
     )]
     class MuteSong : TimedEffect
     {
-        public override bool Start()
+        public override bool StartActions(SchedulerContext context)
         {
-            if (!HarmonyBase.isReady()) return false;
+            if (!HarmonyBase.IsReady()) return false;
 
             try {
-                var p = HarmonyBase.atc.GetType().GetField("_audioSource", BindingFlags.Instance | BindingFlags.NonPublic);
+                var p = HarmonyBase.atc.GetType().GetField("_audioSource", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 AudioSource aso = (AudioSource)p.GetValue(HarmonyBase.atc);
 
                 HarmonyBase.oldvolume = aso.volume;
@@ -30,11 +31,11 @@ namespace CrowdControl.BeatSaber.Effects
             return true;
         }
 
-        public override bool Stop(bool force)
+        public override bool StopActions(bool force)
         {
             try
             {
-                var p = HarmonyBase.atc.GetType().GetField("_audioSource", BindingFlags.Instance | BindingFlags.NonPublic);
+                var p = HarmonyBase.atc.GetType().GetField("_audioSource", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                 AudioSource aso = (AudioSource)p.GetValue(HarmonyBase.atc);
 
                 aso.volume = HarmonyBase.oldvolume;
@@ -51,7 +52,7 @@ namespace CrowdControl.BeatSaber.Effects
 
         public override bool IsReady()
         {
-            if (!HarmonyBase.isReady()) return false;
+            if (!HarmonyBase.IsReady()) return false;
             return true;
         }
     }

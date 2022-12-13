@@ -1,28 +1,26 @@
 ﻿using System;
 using System.Reflection;
+using CrowdControl.Client.Binary;
 
 namespace CrowdControl.BeatSaber.Effects
 {
     [TimedEffectData(
-      ID = 666,
-      Name = "Fast Song (10 Seconds)",
+      ID = 15,
+      Name = "Fast Song",
       Duration = 10
     )]
-    class FastSong : TimedEffect
+    class FastSong : TimedEffect//bug not working
     {
-        public override bool Start()
+        public override bool StartActions(SchedulerContext context)
         {
-            if (!HarmonyBase.isReady()) return false;
-
-            
-            
+            if (!HarmonyBase.IsReady()) return false;
             if (HarmonyBase.speed != 0) return false;
 
-            var p = HarmonyBase.gci.GetType().GetField("_sceneSetupData", BindingFlags.Instance | BindingFlags.NonPublic);
+            FieldInfo f_ssd = typeof(GameplayCoreInstaller).GetField("_sceneSetupData", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
-            Plugin.Log?.Debug($"p: {p}");
+            Plugin.Log?.Debug($"p: {f_ssd}");
 
-            GameplayCoreSceneSetupData sd = (GameplayCoreSceneSetupData)p.GetValue(HarmonyBase.gci);
+            GameplayCoreSceneSetupData sd = (GameplayCoreSceneSetupData)f_ssd.GetValue(HarmonyBase.gci);
 
             HarmonyBase.oldspeed = sd.gameplayModifiers.songSpeedMul;
 
@@ -30,7 +28,7 @@ namespace CrowdControl.BeatSaber.Effects
 
             HarmonyBase.speed = HarmonyBase.oldspeed * 1.75f;
 
-            //var p2 = typeof(UnityEngine.Time).GetProperty("timeSinceLevelLoad", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
+            //var p2 = typeof(UnityEngine.Time).GetProperty("timeSinceLevelLoad", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
 
             //Plugin.Log?.Debug($"p2: {p2}");
 
@@ -49,18 +47,18 @@ namespace CrowdControl.BeatSaber.Effects
 
             Plugin.Log?.Debug($"speed: {HarmonyBase.speed}");
 
-            p = HarmonyBase.gci.GetType().GetField("_audioManager", BindingFlags.Instance | BindingFlags.NonPublic);
+            f_ssd = HarmonyBase.gci.GetType().GetField("_audioManager", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
-            Plugin.Log?.Debug($"p: {p}");
+            Plugin.Log?.Debug($"p: {f_ssd}");
 
-            AudioManagerSO am = (AudioManagerSO)p.GetValue(HarmonyBase.gci);
+            AudioManagerSO am = (AudioManagerSO)f_ssd.GetValue(HarmonyBase.gci);
 
             //am.musicPitch = 1.0f / Base.speed;
 
             return true;
         }
 
-        public override bool Stop(bool force)
+        public override bool StopActions(bool force)
         {
             HarmonyBase.scale = 0;
 
@@ -69,7 +67,7 @@ namespace CrowdControl.BeatSaber.Effects
 
         public override bool IsReady()
         {
-            if (!HarmonyBase.isReady()) return false;
+            if (!HarmonyBase.IsReady()) return false;
             return true;
         }
     }

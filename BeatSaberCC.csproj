@@ -127,14 +127,13 @@
   <ItemGroup>
     <EmbeddedResource Include="Configuration\settings.bsml" />
     <Compile Include="Configuration\SettingsChanged.cs" />
-    <Compile Include="Effects\AllNotesAny.cs" />
-    <Compile Include="Effects\AllNotesDown.cs" />
-    <Compile Include="Effects\AllNotesRandom.cs" />
+    <Compile Include="Effects\AllNotesDirection.cs" />
     <Compile Include="Effects\HarmonyBase.cs" />
     <Compile Include="Effects\FailSong.cs" />
-    <Compile Include="Effects\FastForwad.cs" />
     <Compile Include="Effects\FastSong.cs" />
-    <Compile Include="Effects\GiantNotes.cs" />
+    <Compile Include="Effects\SetJumpDuration.cs" />
+    <Compile Include="Effects\SetNJS.cs" />
+    <Compile Include="Effects\NoteSize.cs" />
     <Compile Include="Effects\EffectBase.cs" />
     <Compile Include="Effects\MuteSong.cs" />
     <Compile Include="Effects\NoteColorRandom.cs" />
@@ -142,8 +141,7 @@
     <Compile Include="Effects\NoteMirror.cs" />
     <Compile Include="Effects\NoteWaveX.cs" />
     <Compile Include="Effects\NoteWaveY.cs" />
-    <Compile Include="Effects\Rewind.cs" />
-    <Compile Include="Effects\TinyNotes.cs" />
+    <Compile Include="Effects\SkipDirection.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\PluginConfig.cs" />

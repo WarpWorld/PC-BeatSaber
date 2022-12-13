@@ -22,10 +22,18 @@ namespace CrowdControl.BeatSaber.Effects
 
         public override EffectType Type => EffectType.Instant;
 
-        public override bool Start(SchedulerContext context) => Start();
-        public abstract bool Start();
+        private static readonly TimeSpan MAX_NOTE_WAIT = TimeSpan.FromSeconds(5d);
+        public override bool Start(SchedulerContext context)
+            => HarmonyBase.NextNoteAsync().Wait(MAX_NOTE_WAIT) && StartActions(context);
+
+        public abstract bool StartActions(SchedulerContext context);
 
         public override bool IsReady() => false;
+
+        public static void NotSupported(SchedulerContext context, string message = "")
+        {
+            context.Cancel(EffectStatus.FailPermanent, message);
+        }
     }
 
     [AttributeUsage(AttributeTargets.Class)]
@@ -40,8 +48,8 @@ namespace CrowdControl.BeatSaber.Effects
 
         public override TimeSpan DefaultDuration => TimeSpan.FromSeconds((m_effectData as TimedEffectData)?.Duration ?? 10d);
 
-        public override bool Stop() => Stop(false);
-        public abstract bool Stop(bool force);
+        public override bool Stop() => StopActions(false);
+        public abstract bool StopActions(bool force);
     }
 
     internal static class EffectEx

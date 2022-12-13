@@ -1,15 +1,17 @@
-﻿namespace CrowdControl.BeatSaber.Effects
+﻿using CrowdControl.Client.Binary;
+
+namespace CrowdControl.BeatSaber.Effects
 {
     [TimedEffectData(
       ID = 12,
-      Name = "Wavy Notes Horizontal (10 Seconds)",
+      Name = "Wavy Notes Horizontal",
       Duration = 10
     )]
     class NoteWaveX : TimedEffect
     {
-        public override bool Start()
+        public override bool StartActions(SchedulerContext context)
         {
-            if (!HarmonyBase.isReady()) return false;
+            if (!HarmonyBase.IsReady()) return false;
 
             if (HarmonyBase.wavex) return false;
 
@@ -18,7 +20,7 @@
             return true;
         }
 
-        public override bool Stop(bool force)
+        public override bool StopActions(bool force)
         {
             HarmonyBase.wavex = false;
 
@@ -27,7 +29,7 @@
 
         public override bool IsReady()
         {
-            if (!HarmonyBase.isReady()) return false;
+            if (!HarmonyBase.IsReady()) return false;
             return true;
         }
     }

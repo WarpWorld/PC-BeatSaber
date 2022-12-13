@@ -84,42 +84,16 @@ namespace CrowdControl.BeatSaber
             m_client.EffectRequested += (request, respond) =>
             {
                 Plugin.Log?.Debug($"Effect request received [E:{request.EffectID}].");
-                //probably want to do something here
-                //respond(...);
+                
             };
 
             m_scheduler = new Scheduler(m_client, Assembly.GetExecutingAssembly());
             m_scheduler.Start();
             Plugin.Log?.Debug("Scheduler initialized.");
-            //dispose of s in some dispose method somewhere
         }
 
         //private void BSEvents_gameSceneLoaded() => BS_Utils.Gameplay.ScoreSubmission.DisableSubmission(Plugin.CROWD_CONTROL);
-
-        /// <summary>
-        /// Only ever called once on the first frame the script is Enabled. Start is called after any other script's Awake() and before Update().
-        /// </summary>
-        private void Start()
-        {
-
-        }
-
-        /// <summary>
-        /// Called every frame if the script is enabled.
-        /// </summary>
-        private void Update()
-        {
-
-        }
-
-        /// <summary>
-        /// Called every frame after every other enabled script's Update().
-        /// </summary>
-        private void LateUpdate()
-        {
-
-        }
-
+        
         /// <summary>
         /// Called when the script becomes enabled and active
         /// </summary>
